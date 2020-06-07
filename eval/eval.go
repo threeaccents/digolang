@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"fmt"
+
 	"github.com/threeaccents/digolang/ast"
 	"github.com/threeaccents/digolang/object"
 )
@@ -15,6 +17,8 @@ func Eval(n ast.Node) object.Object {
 	switch node := n.(type) {
 	case *ast.Program:
 		return evalProgram(node.Statements)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node.Statements)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
 	case *ast.IntegerLiteral:
@@ -25,27 +29,42 @@ func Eval(n ast.Node) object.Object {
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.PrefixExpression:
 		right := Eval(node.Right)
+		if isError(right) {
+			return right
+		}
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.InfixExpression:
 		right := Eval(node.Right)
+		if isError(right) {
+			return right
+		}
 		left := Eval(node.Left)
+		if isError(left) {
+			return left
+		}
 		return evalInfixExpression(node.Operator, left, right)
-	case *ast.BlockStatement:
-		return evalBlockStatement(node.Statements)
 	case *ast.IfExpression:
 		return evalIfExpression(node)
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue)
+		if isError(val) {
+			return val
+		}
 		return &object.ReturnValue{Value: val}
 	}
 
 	return nil
 }
 
-
-
 func evalIfExpression(node *ast.IfExpression) object.Object {
 	condition := Eval(node.Condition)
+	if isError(condition) {
+		return condition
+	}
+
+	if condition.Type() != object.BOOLEAN_OBJ && condition.Type() != object.NULL_OBJ {
+		return newError("unknown operator: %s%s%s", "if(", condition.Type(), ")")
+	}
 
 	if isTruthy(condition) {
 		return Eval(node.Consequence)
@@ -56,10 +75,9 @@ func evalIfExpression(node *ast.IfExpression) object.Object {
 	}
 }
 
-
 func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
 	if left.Type() != right.Type() {
-		return NULL
+		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	}
 
 	// since we know right and left are the same we can just pick and choose which one to use for the switch statement.
@@ -70,7 +88,7 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 		return evalBooleanInfixExpression(operator, left, right)
 	}
 
-	return NULL
+	return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 }
 
 func evalBooleanInfixExpression(operator string, left object.Object, right object.Object) object.Object {
@@ -80,7 +98,8 @@ func evalBooleanInfixExpression(operator string, left object.Object, right objec
 	case "!=":
 		return nativeBoolToBooleanObject(left != right)
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s",
+			left.Type(), operator, right.Type())
 	}
 }
 
@@ -105,9 +124,10 @@ func evalIntegerInfixExpression(operator string, left object.Object, right objec
 		return nativeBoolToBooleanObject(leftVal == rightVal)
 	case "!=":
 		return nativeBoolToBooleanObject(leftVal != rightVal)
+	default:
+		return newError("unknown operator: %s %s %s",
+			left.Type(), operator, right.Type())
 	}
-
-	return NULL
 }
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
@@ -122,7 +142,7 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 
 func evalBangPrefixExpression(right object.Object) object.Object {
 	if right.Type() != object.BOOLEAN_OBJ {
-		return NULL
+		return newError("unknown operator: %s%s", "!", right.Type())
 	}
 
 	val := right.(*object.Boolean).Value
@@ -132,7 +152,7 @@ func evalBangPrefixExpression(right object.Object) object.Object {
 
 func evalMinusPrefixExpression(right object.Object) object.Object {
 	if right.Type() != object.INTEGER_OBJ {
-		return NULL
+		return newError("unknown operator: %s%s", "-", right.Type())
 	}
 
 	val := right.(*object.Integer).Value
@@ -155,8 +175,11 @@ func evalBlockStatement(stmts []ast.Statement) object.Object {
 	for _, statement := range stmts {
 		result = Eval(statement)
 
-		if result != nil && result.Type() == object.RETURN_VALUE_OBJ {
-			return result
+		if result != nil {
+			rt := result.Type()
+			if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ {
+				return result
+			}
 		}
 	}
 
@@ -169,8 +192,11 @@ func evalProgram(stmts []ast.Statement) object.Object {
 	for _, statement := range stmts {
 		result = Eval(statement)
 
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			return returnValue.Value
+		switch result := result.(type) {
+		case *object.ReturnValue:
+			return result.Value
+		case *object.Error:
+			return result
 		}
 	}
 
@@ -186,7 +212,18 @@ func isTruthy(obj object.Object) bool {
 	case FALSE:
 		return false
 	default:
-		// return error
+		// this is a non null object
 		return true
 	}
+}
+
+func isError(obj object.Object) bool {
+	if obj != nil {
+		return obj.Type() == object.ERROR_OBJ
+	}
+	return false
+}
+
+func newError(format string, a ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }
