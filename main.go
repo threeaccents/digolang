@@ -3,13 +3,15 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/threeaccents/digolang/eval"
-	"github.com/threeaccents/digolang/lexer"
-	"github.com/threeaccents/digolang/parser"
 	"io"
 	"os"
 	"os/user"
 	"strings"
+
+	"github.com/threeaccents/digolang/eval"
+	"github.com/threeaccents/digolang/lexer"
+	"github.com/threeaccents/digolang/object"
+	"github.com/threeaccents/digolang/parser"
 
 	"github.com/threeaccents/digolang/repl"
 )
@@ -49,7 +51,7 @@ func main() {
 
 			fmt.Println("evaluating program...")
 
-			evaluated := eval.Eval(program)
+			evaluated := eval.Eval(program, object.NewEnvironment())
 			if evaluated != nil {
 				io.WriteString(os.Stdout, evaluated.Inspect())
 				io.WriteString(os.Stdout, "\n")
