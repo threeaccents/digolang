@@ -50,11 +50,7 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
 	case *ast.LetStatement:
-		val := Eval(node.Value, env)
-		if isError(val) {
-			return val
-		}
-		env.Set(node.Name.Value, val)
+		evalLetStatement(node, env)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	case *ast.CallExpression:
@@ -83,6 +79,18 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func evalLetStatement(node *ast.LetStatement, env *object.Environment) {
+	if node.Expression == nil {
+		env.Set(node.Name.Value, NULL)
+		return
+	}
+	val := Eval(node.Expression, env)
+	if isError(val) {
+		return
+	}
+	env.Set(node.Name.Value, val)
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
@@ -240,8 +248,9 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 		return evalBangPrefixExpression(right)
 	case "-":
 		return evalMinusPrefixExpression(right)
+	default:
+		return newError("unknown operator: %s%s", operator, right.Type())
 	}
-	return NULL
 }
 
 func evalBangPrefixExpression(right object.Object) object.Object {

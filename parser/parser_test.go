@@ -496,7 +496,7 @@ func TestIdentifierExpression(t *testing.T) {
 		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
 	}
 	if ident.Value != "foobar" {
-		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
+		t.Errorf("ident.Expression not %s. got=%s", "foobar", ident.Value)
 	}
 	if ident.TokenLiteral() != "foobar" {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar",
@@ -527,7 +527,7 @@ func TestBooleanLiteralExpression(t *testing.T) {
 		t.Fatalf("exp not *ast.BooleanLiteral. got=%T", stmt.Expression)
 	}
 	if ident.Value != true {
-		t.Errorf("ident.Value not %s. got=%v", "5", ident.Value)
+		t.Errorf("ident.Expression not %s. got=%v", "5", ident.Value)
 	}
 	if ident.TokenLiteral() != "true" {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "true",
@@ -558,7 +558,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
 	}
 	if ident.Value != 5 {
-		t.Errorf("ident.Value not %s. got=%d", "5", ident.Value)
+		t.Errorf("ident.Expression not %s. got=%d", "5", ident.Value)
 	}
 	if ident.TokenLiteral() != "5" {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "5",
@@ -589,7 +589,7 @@ func TestStringLiteralExpression(t *testing.T) {
 		t.Fatalf("exp not *ast.StringLiteral. got=%T", stmt.Expression)
 	}
 	if ident.Value != "r0dr!g0" {
-		t.Errorf("ident.Value not %s. got=%s", "r0dr!g0", ident.Value)
+		t.Errorf("ident.Expression not %s. got=%s", "r0dr!g0", ident.Value)
 	}
 	if ident.TokenLiteral() != "r0dr!g0" {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "r0dr!g0",
@@ -624,7 +624,7 @@ func TestLetStatements(t *testing.T) {
 			return
 		}
 
-		val := stmt.(*ast.LetStatement).Value
+		val := stmt.(*ast.LetStatement).Expression
 		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 		}
@@ -719,7 +719,7 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 	}
 
 	if bo.Value != value {
-		t.Errorf("bo.Value not %t. got=%t", value, bo.Value)
+		t.Errorf("bo.Expression not %t. got=%t", value, bo.Value)
 		return false
 	}
 
@@ -740,7 +740,7 @@ func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	}
 
 	if ident.Value != value {
-		t.Errorf("ident.Value not %s. got=%s", value, ident.Value)
+		t.Errorf("ident.Expression not %s. got=%s", value, ident.Value)
 		return false
 	}
 
@@ -761,7 +761,7 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 	}
 
 	if integ.Value != value {
-		t.Errorf("integ.Value not %d. got=%d", value, integ.Value)
+		t.Errorf("integ.Expression not %d. got=%d", value, integ.Value)
 		return false
 	}
 
@@ -782,7 +782,7 @@ func testStringLiteral(t *testing.T, il ast.Expression, value string) bool {
 	}
 
 	if stringLit.Value != value {
-		t.Errorf("integ.Value not %s. got=%s", value, stringLit.Value)
+		t.Errorf("integ.Expression not %s. got=%s", value, stringLit.Value)
 		return false
 	}
 
