@@ -66,6 +66,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -105,6 +106,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
+	fmt.Println("statement current token", p.curToken.Literal)
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
@@ -162,7 +164,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	stmt.Expression = p.parseExpression(LOWEST)
 
-	for p.curTokenIs(token.SEMICOLON) {
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -178,7 +180,7 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	stmt.ReturnValue = p.parseExpression(LOWEST)
 
-	for p.curTokenIs(token.SEMICOLON) {
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -216,6 +218,42 @@ func (p *Parser) parseIdentifier() ast.Expression {
 		Token: p.curToken,
 		Value: p.curToken.Literal,
 	}
+}
+
+func (p *Parser) parseArrayLiteral() ast.Expression {
+	al := &ast.ArrayLiteral{
+		Token:    p.curToken,
+		Elements: []ast.Expression{},
+	}
+
+	al.Elements = p.parseExpressionList(token.RBRACKET)
+
+	return al
+}
+
+func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+	var list []ast.Expression
+
+	if p.peekTokenIs(token.RBRACKET) {
+		return list
+	}
+
+	p.nextToken()
+
+	list = append(list, p.parseExpression(LOWEST))
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(end) {
+		return nil
+	}
+
+	return list
 }
 
 func (p *Parser) parseFunctionLiteral() ast.Expression {
