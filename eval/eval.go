@@ -158,7 +158,7 @@ func evalIfExpression(node *ast.IfExpression, env *object.Environment) object.Ob
 		return condition
 	}
 
-	if condition.Type() != object.BOOLEAN_OBJ && condition.Type() != object.NULL_OBJ {
+	if condition.Type() != object.BOOLEAN_OBJ {
 		return newError("unknown operator: %s%s%s", "if(", condition.Type(), ")")
 	}
 
@@ -317,17 +317,11 @@ func evalProgram(stmts []ast.Statement, env *object.Environment) object.Object {
 }
 
 func isTruthy(obj object.Object) bool {
-	switch obj {
-	case NULL:
-		return false
-	case TRUE:
-		return true
-	case FALSE:
-		return false
-	default:
-		// this is a non null object
+	if obj == TRUE {
 		return true
 	}
+
+	return false
 }
 
 func isError(obj object.Object) bool {
