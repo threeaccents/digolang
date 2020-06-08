@@ -235,6 +235,10 @@ func TestErrorHandling(t *testing.T) {
 			"unknown operator: if(INTEGER)",
 		},
 		{
+			"let a; if (a) {5}",
+			"unknown operator: if(NULL)",
+		},
+		{
 			"5 + true; 5;",
 			"type mismatch: INTEGER + BOOLEAN",
 		},
