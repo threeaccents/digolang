@@ -13,6 +13,12 @@ let max = fn(x, y) {
     return y;
 };
 
+let no_value;
+
+if isNull(no_value) {
+    return "is null!"
+}
+
 let greeter = fn(name) {
     return "hello" + " " + name
 }

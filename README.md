@@ -18,17 +18,21 @@ let max = fn(x, y) {
     return y;
 };
 
-fn(x) {x==5}(9)
+let no_value;
 
-let adder(x) {
-    return fn(y) {x + y};
-};
+if isNull(no_value) {
+    return "is null!"
+}
 
-let newAdder = adder(2)
-let addTwo = newAdder(2);
+let greeter = fn(name) {
+    return "hello" + " " + name
+}
+
+greeter("digolang")
 
 let whichIsMax = max(10, 20);
 
 return whichIsMax;
+
 
 ```
