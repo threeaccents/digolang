@@ -18,6 +18,8 @@ let max = fn(x, y) {
     return y;
 };
 
+fn(x) {x==5}(9)
+
 let whichIsMax = max(10, 20);
 
 return whichIsMax;
