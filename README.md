@@ -24,10 +24,8 @@ let adder(x) {
     return fn(y) {x + y};
 };
 
-let addTwo = adder(2)
-let four = addTwo(2);
-
-four;
+let newAdder = adder(2)
+let addTwo = newAdder(2);
 
 let whichIsMax = max(10, 20);
 
