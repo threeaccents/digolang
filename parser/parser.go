@@ -149,6 +149,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	}
 
 	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
 		stmt.Expression = nil
 		return stmt
 	}

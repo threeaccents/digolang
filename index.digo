@@ -1,31 +1,22 @@
-let a = 1;
-let b = 1;
+let greeter = fn(name)
+{
+    return "hello" + " " + name;
+}
+;
 
-let sum = fn(a, b) {a+b};
+let msg = greeter("world");
 
-let result = sum(5, 5);
+println(msg);
 
-let max = fn(x, y) {
-    if(x > y) {
-        return x;
-    }
+let a = "hello";
 
-    return y;
-};
+let b;
 
-let no_value;
-
-if isNull(no_value) {
-    return "is null!"
+if (isNull(b)) {
+    println("IS NULL!")
+} else {
+    println("NOT NULL");
 }
 
-let greeter = fn(name) {
-    return "hello" + " " + name
-}
 
-greeter("digolang")
-
-let whichIsMax = max(10, 20);
-
-return whichIsMax;
 

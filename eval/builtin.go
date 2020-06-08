@@ -1,6 +1,10 @@
 package eval
 
-import "github.com/threeaccents/digolang/object"
+import (
+	"fmt"
+
+	"github.com/threeaccents/digolang/object"
+)
 
 var builtins = map[string]*object.Builtin{
 	"len": &object.Builtin{
@@ -35,6 +39,19 @@ var builtins = map[string]*object.Builtin{
 			}
 
 			return FALSE
+		},
+	},
+	"println": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			var msgs []interface{}
+
+			for _, arg := range args {
+				msgs = append(msgs, arg.Inspect())
+			}
+
+			fmt.Println(msgs...)
+
+			return nil
 		},
 	},
 }
