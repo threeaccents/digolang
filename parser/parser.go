@@ -18,6 +18,7 @@ const (
 	PRODUCT     // * or /
 	PREFIX      // -X or !X
 	CALL        // myFunction(X)
+	INDEX       // array[x]
 )
 
 var precedences = map[token.TokenType]int{
@@ -30,6 +31,7 @@ var precedences = map[token.TokenType]int{
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
+	token.LBRACKET: INDEX,
 }
 
 type (
@@ -78,6 +80,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -106,7 +109,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
-	fmt.Println("statement current token", p.curToken.Literal)
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
@@ -463,6 +465,23 @@ func (p *Parser) parseCallExpression(left ast.Expression) ast.Expression {
 	ce.Arguments = p.parseFunctionArguments()
 
 	return ce
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	ie := &ast.IndexExpression{
+		Token: p.curToken,
+		Left:  left,
+	}
+
+	p.nextToken()
+
+	ie.Index = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return ie
 }
 
 func (p *Parser) parseFunctionArguments() []ast.Expression {
