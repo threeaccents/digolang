@@ -20,6 +20,15 @@ let max = fn(x, y) {
 
 fn(x) {x==5}(9)
 
+let adder(x) {
+    return fn(y) {x + y};
+};
+
+let addTwo = adder(2)
+let four = addTwo(2);
+
+four;
+
 let whichIsMax = max(10, 20);
 
 return whichIsMax;
