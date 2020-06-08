@@ -13,10 +13,32 @@ let a = "hello";
 let b;
 
 if (isNull(b)) {
-    println("IS NULL!")
+    println("b IS NULL!")
 } else {
-    println("NOT NULL");
+    println("b NOT NULL", "it's", b);
 }
+
+if (isNull(a)) {
+    println("a IS NULL!")
+} else {
+    println("a NOT NULL", "it's", a);
+}
+
+let add = fn(x)
+{
+    return fn(y)
+    {
+        x + y;
+    }
+    ;
+}
+;
+
+let adder = add(2);
+
+let four = adder(2);
+
+println(four)
 
 
 

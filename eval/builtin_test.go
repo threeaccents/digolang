@@ -36,6 +36,25 @@ func TestIsNullBuiltinFunctions(t *testing.T) {
 	}
 }
 
+func TestPrintlnBuiltinFunctions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`println("hello world")`, nil},
+		{`println("hello", "world")`, nil},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		if evaluated != nil {
+			t.Errorf("wrong type. got=%T (%+v)", evaluated, evaluated)
+			continue
+		}
+	}
+}
+
 func TestLenBuiltinFunctions(t *testing.T) {
 	tests := []struct {
 		input    string
