@@ -29,6 +29,12 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 		return &object.String{
 			Value: node.Value,
 		}
+	case *ast.ArrayLiteral:
+		elements := evalExpressions(node.Elements, env)
+		if len(elements) == 1 && isError(elements[0]) {
+			return elements[0]
+		}
+		return &object.Array{Elements: elements}
 	case *ast.BooleanLiteral:
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.PrefixExpression:
@@ -37,6 +43,16 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalPrefixExpression(node.Operator, right)
+	case *ast.IndexExpression:
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+		return evalIndexExpression(left, index)
 	case *ast.InfixExpression:
 		right := Eval(node.Right, env)
 		if isError(right) {
@@ -79,6 +95,25 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func evalIndexExpression(left object.Object, index object.Object) object.Object {
+	if index.Type() != object.INTEGER_OBJ {
+		return newError("unknown operator: %s%s%s", "[", index.Type(), "]")
+	}
+
+	if left.Type() != object.ARRAY_OBJ {
+		return newError("unknown operator: %s%s", left.Type(), "[]")
+	}
+
+	elements := left.(*object.Array).Elements
+	indexVal := index.(*object.Integer).Value
+
+	if indexVal < 0 || indexVal > int64(len(elements)-1) {
+		return NULL
+	}
+
+	return elements[indexVal]
 }
 
 func evalLetStatement(node *ast.LetStatement, env *object.Environment) {
