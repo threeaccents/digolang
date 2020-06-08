@@ -3,36 +3,43 @@
 Toy programming language based of the Thorsten Ball's incredible book, [Writing an Interpeter in Go](https://interpreterbook.com).
 
 ```
-let a = 1;
-let b = 1;
-
-let sum = fn(a, b) {a+b};
-
-let result = sum(5, 5);
-
-let max = fn(x, y) {
-    if(x > y) {
-        return x;
-    }
-
-    return y;
+let greeter = fn(name){
+    return "hello" + " " + name;
 };
 
-let no_value;
+let msg = greeter("world");
 
-if isNull(no_value) {
-    return "is null!"
+println(msg);
+
+let a = "hello";
+
+let b;
+
+if (isNull(b)) {
+    println("b IS NULL!")
+} else {
+    println("b NOT NULL", "it's", b);
 }
 
-let greeter = fn(name) {
-    return "hello" + " " + name
+if (isNull(a)) {
+    println("a IS NULL!")
+} else {
+    println("a NOT NULL", "it's", a);
 }
 
-greeter("digolang")
+let add = fn(x) {
+    return fn(y) {
+        x + y;
+    };
+};
 
-let whichIsMax = max(10, 20);
+let adder = add(2);
 
-return whichIsMax;
+let four = adder(2);
 
+println(four);
 
+let howLong = "how long is this string?";
+
+println(howLong, len(howLong));
 ```

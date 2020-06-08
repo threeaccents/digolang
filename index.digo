@@ -38,7 +38,10 @@ let adder = add(2);
 
 let four = adder(2);
 
-println(four)
+println(four);
 
+let howLong = "how long is this string?";
+
+println(howLong, len(howLong));
 
 
