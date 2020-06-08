@@ -13,7 +13,11 @@ let max = fn(x, y) {
     return y;
 };
 
-let phrase = "hello" + " " + "world"
+let greeter = fn(name) {
+    return "hello" + " " + name
+}
+
+greeter("digolang")
 
 let whichIsMax = max(10, 20);
 

@@ -227,6 +227,10 @@ func TestErrorHandling(t *testing.T) {
 		expectedMessage string
 	}{
 		{
+			`"Hello" - "World"`,
+			"unknown operator: STRING - STRING",
+		},
+		{
 			"if (1) {5}",
 			"unknown operator: if(INTEGER)",
 		},
