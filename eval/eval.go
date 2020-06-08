@@ -53,6 +53,23 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 		env.Set(node.Name.Value, val)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
+	case *ast.CallExpression:
+		function := Eval(node.Function, env)
+		if isError(function) {
+			return function
+		}
+		args := evalExpressions(node.Arguments, env)
+		if len(args) == 1 && isError(args[0]) {
+			return args[0]
+		}
+
+		return applyFunction(function, args)
+	case *ast.FunctionLiteral:
+		return &object.Function{
+			Body:       node.Body,
+			Parameters: node.Parameters,
+			Env:        env,
+		}
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue, env)
 		if isError(val) {
@@ -62,6 +79,42 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	fnObject, ok := fn.(*object.Function)
+	if !ok {
+		return newError("not a function: %s", fn.Type())
+	}
+
+	extendedEnv := object.NewInnerEnvironment(fnObject.Env)
+
+	for paramIdx, param := range fnObject.Parameters {
+		extendedEnv.Set(param.Value, args[paramIdx])
+	}
+
+	evaluated := Eval(fnObject.Body, extendedEnv)
+
+	if returnValue, ok := evaluated.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+
+	return evaluated
+}
+
+func evalExpressions(arguments []ast.Expression, env *object.Environment) []object.Object {
+	var result []object.Object
+
+	for _, arg := range arguments {
+		v := Eval(arg, env)
+		if isError(v) {
+			return []object.Object{v}
+		}
+
+		result = append(result, v)
+	}
+
+	return result
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
