@@ -39,4 +39,8 @@ let howLong = "how long is this string?"
 
 println(howLong, len(howLong))
 
+let myarr = [1,2,3]
+
+println(myarr[0])
+
 
