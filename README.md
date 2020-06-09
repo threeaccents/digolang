@@ -48,6 +48,8 @@ let myarr = [1,2,3]
 
 println(myarr[0])
 
-
-
+println(myarr.len)
+println(myarr.first)
+println(myarr.last)
+println(myarr.rest)
 ```
