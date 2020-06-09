@@ -30,6 +30,7 @@ if (5 < 10) {
 "hello";
 "r0dr!g0_l3''@";
 []
+.
 `
 
 	tests := []struct {
@@ -117,6 +118,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.LBRACKET, "["},
 		{token.RBRACKET, "]"},
+		{token.PERIOD, "."},
 		{token.EOF, ""},
 	}
 

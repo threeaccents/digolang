@@ -12,6 +12,7 @@ const (
 	STRING_OBJ       = "STRING"
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
+	SELECTOR_OBJ     = "SELECTOR"
 )
 
 type Object interface {

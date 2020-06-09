@@ -25,6 +25,7 @@ const (
 	Q
 
 	COMMA     = ","
+	PERIOD    = "."
 	SEMICOLON = ";"
 
 	LPAREN   = "("
