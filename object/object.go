@@ -20,3 +20,7 @@ type Object interface {
 	Type() ObjectType
 	Inspect() string
 }
+
+type Invokable interface {
+	InvokeMethod()
+}
