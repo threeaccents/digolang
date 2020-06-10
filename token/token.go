@@ -27,6 +27,7 @@ const (
 	COMMA     = ","
 	PERIOD    = "."
 	SEMICOLON = ";"
+	COLON     = ":"
 
 	LPAREN   = "("
 	RPAREN   = ")"

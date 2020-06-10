@@ -31,6 +31,7 @@ if (5 < 10) {
 "r0dr!g0_l3''@";
 []
 .
+{:}
 `
 
 	tests := []struct {
@@ -119,6 +120,9 @@ if (5 < 10) {
 		{token.LBRACKET, "["},
 		{token.RBRACKET, "]"},
 		{token.PERIOD, "."},
+		{token.LBRACE, "{"},
+		{token.COLON, ":"},
+		{token.RBRACE, "}"},
 		{token.EOF, ""},
 	}
 
