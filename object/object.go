@@ -13,6 +13,7 @@ const (
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
 	SELECTOR_OBJ     = "SELECTOR"
+	HASH_OBJ         = "HASH"
 )
 
 type Object interface {

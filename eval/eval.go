@@ -35,6 +35,8 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 			return elements[0]
 		}
 		return &object.Array{Elements: elements}
+	case *ast.HashLiteral:
+		return evalHashLiteral(node, env)
 	case *ast.BooleanLiteral:
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.PrefixExpression:
@@ -98,7 +100,68 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	return nil
 }
 
+func evalHashLiteral(node *ast.HashLiteral, env *object.Environment) object.Object {
+	hash := &object.Hash{
+		Pairs: make(map[object.HashKey]object.HashPair),
+	}
+
+	for pkey, pvalue := range node.Pairs {
+		key := Eval(pkey, env)
+		if isError(key) {
+			return nil
+		}
+
+		hashable, ok := key.(object.Hashable)
+		if !ok {
+			return newError("error")
+		}
+
+		value := Eval(pvalue, env)
+		if isError(key) {
+			return nil
+		}
+
+		hashKey := hashable.HashKey()
+
+		hash.Pairs[hashKey] = object.HashPair{
+			Key:   key,
+			Value: value,
+		}
+	}
+
+	return hash
+}
+
 func evalIndexExpression(left object.Object, index object.Object) object.Object {
+	switch left.Type() {
+	case object.ARRAY_OBJ:
+		return evalArrayIndexExpression(left, index)
+	case object.HASH_OBJ:
+		return evalHashIndexExpression(left, index)
+	default:
+		return newError("")
+	}
+}
+
+func evalHashIndexExpression(left object.Object, index object.Object) object.Object {
+	hash := left.(*object.Hash)
+
+	hashable, ok := index.(object.Hashable)
+	if !ok {
+		return newError("error")
+	}
+
+	hashKey := hashable.HashKey()
+
+	pair, ok := hash.Pairs[hashKey]
+	if !ok {
+		return NULL
+	}
+
+	return pair.Value
+}
+
+func evalArrayIndexExpression(left object.Object, index object.Object) object.Object {
 	if index.Type() != object.INTEGER_OBJ {
 		return newError("unknown operator: %s%s%s", "[", index.Type(), "]")
 	}
