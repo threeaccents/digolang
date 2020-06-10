@@ -66,12 +66,6 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	case *ast.IfExpression:
 
 		return evalIfExpression(node, env)
-	case *ast.SelectorExpression:
-		left := Eval(node.Expression, env)
-		if isError(left) {
-			return left
-		}
-		return evalSelectorExpression(left, node.Selector)
 	case *ast.LetStatement:
 		evalLetStatement(node, env)
 	case *ast.Identifier:
@@ -102,32 +96,6 @@ func Eval(n ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
-}
-
-func evalSelectorExpression(left object.Object, selector *ast.Identifier) object.Object {
-	if left.Type() != object.ARRAY_OBJ {
-		return newError("unknown operator: %s.%s", left.Type(), selector.String())
-	}
-
-	arr := left.(*object.Array)
-
-	obj := evalBuiltinIdentifier(selector)
-
-	if obj.Type() != object.BUILTIN_OBJ {
-		return newError("invalid selector: %s", selector.String())
-	}
-
-	builtin := obj.(*object.Builtin)
-
-	allowedBuiltin := []string{"len", "rest", "push", "last", "first"}
-
-	for _, item := range allowedBuiltin {
-		if item == selector.String() {
-			return evalBuiltin(builtin, []object.Object{arr})
-		}
-	}
-
-	return newError("unknown operator: %s.%s", left.Type(), selector.String())
 }
 
 func evalIndexExpression(left object.Object, index object.Object) object.Object {

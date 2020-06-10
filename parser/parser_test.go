@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/threeaccents/digolang/token"
-
 	"github.com/threeaccents/digolang/ast"
 
 	"github.com/threeaccents/digolang/lexer"
@@ -32,28 +30,6 @@ func TestParsingArrayLiterals(t *testing.T) {
 	testIntegerLiteral(t, array.Elements[0], 1)
 	testInfixExpression(t, array.Elements[1], 2, "*", 2)
 	testInfixExpression(t, array.Elements[2], 3, "+", 3)
-}
-
-func TestParsingSelectorExpressions(t *testing.T) {
-	input := "myarr.filter"
-
-	l := lexer.New(input)
-	p := New(l)
-	program := p.ParseProgram()
-	checkParserErrors(t, p)
-
-	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
-	sel, ok := stmt.Expression.(*ast.SelectorExpression)
-	if !ok {
-		t.Fatalf("exp not ast.SelectorExpression. got=%T", stmt.Expression)
-	}
-
-	if sel.Token.Type != token.PERIOD {
-		t.Fatalf("token not token.Period. got=%s", sel.Token.Type)
-	}
-
-	testIdentifier(t, sel.Expression, "myarr")
-	testIdentifier(t, sel.Selector, "filter")
 }
 
 func TestParsingIndexExpressions(t *testing.T) {

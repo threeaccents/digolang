@@ -57,46 +57,6 @@ func TestArrayLiterals(t *testing.T) {
 	testIntegerObject(t, result.Elements[2], 6)
 }
 
-func TestSelectorLiteral(t *testing.T) {
-	input := "[].len()"
-
-	evaluated := testEval(input)
-	_, ok := evaluated.(*object.Selector)
-	if !ok {
-		t.Fatalf("object is not Selector. got=%T (%+v)", evaluated, evaluated)
-	}
-}
-
-func TestSelectorExpression(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected interface{}
-	}{
-		{
-			"[1,2,3].len",
-			3,
-		},
-		{
-			"[1,2,3].first",
-			1,
-		},
-		{
-			"[1,2,3].last",
-			3,
-		},
-	}
-
-	for _, tt := range tests {
-		evaluated := testEval(tt.input)
-		switch expected := tt.expected.(type) {
-		case int:
-			testIntegerObject(t, evaluated, int64(expected))
-		default:
-			testNullObject(t, evaluated)
-		}
-	}
-}
-
 func TestArrayIndexExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -343,14 +303,6 @@ func TestErrorHandling(t *testing.T) {
 		input           string
 		expectedMessage string
 	}{
-		{
-			`[1,2].isNull`,
-			"unknown operator: ARRAY.isNull",
-		},
-		{
-			`1.len`,
-			"unknown operator: INTEGER.len",
-		},
 		{
 			`"Hello" - "World"`,
 			"unknown operator: STRING - STRING",
